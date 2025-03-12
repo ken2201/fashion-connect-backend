@@ -54,7 +54,7 @@ const products = ref([]);
 // Search products from backend
 const searchProducts = async () => {
   try {
-    const response = await axios.get(`http://127.0.0.1:8000/search_products?query=${searchQuery.value}`);
+    const response = await axios.get(`https://fashion-connect-backend.onrender.com/search_products?query=${searchQuery.value}`);
     products.value = response.data;
   } catch (error) {
     console.error('Search error:', error);

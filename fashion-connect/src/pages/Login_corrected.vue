@@ -54,7 +54,7 @@ export default {
         params.append('username', this.form.username);
         params.append('password', this.form.password);
 
-        const response = await axios.post('http://127.0.0.1:8000/token', params);
+        const response = await axios.post('https://fashion-connect-backend.onrender.com/token', params);
 
         const token = response.data.access_token;
         // Stocker le token pour les futures requêtes

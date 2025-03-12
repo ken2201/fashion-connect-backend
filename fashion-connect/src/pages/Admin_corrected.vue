@@ -72,7 +72,7 @@ const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJLZW4iLCJleHAiOjE3
 
 const fetchProducts = async () => {
   try {
-    const response = await axios.get('http://127.0.0.1:8000/products');
+    const response = await axios.get('https://fashion-connect-backend.onrender.com/products');
     products.value = response.data;
   } catch (error) {
     console.error('Error fetching products:', error);
@@ -81,7 +81,7 @@ const fetchProducts = async () => {
 
 const addProduct = async () => {
   try {
-    await axios.post('http://127.0.0.1:8000/add_product', newProduct.value, {
+    await axios.post('https://fashion-connect-backend.onrender.com/add_product', newProduct.value, {
       headers: { Authorization: `Bearer ${token}` }
     });
     await fetchProducts();
@@ -97,7 +97,7 @@ const editProductForm = (product) => {
 
 const updateProduct = async () => {
   try {
-    await axios.put(`http://127.0.0.1:8000/update_product/${editingProduct.value.id}`, editingProduct.value, {
+    await axios.put(`https://fashion-connect-backend.onrender.com/update_product/${editingProduct.value.id}`, editingProduct.value, {
       headers: { Authorization: `Bearer ${token}` }
     });
     await fetchProducts();
@@ -109,7 +109,7 @@ const updateProduct = async () => {
 
 const deleteProduct = async (id) => {
   try {
-    await axios.delete(`http://127.0.0.1:8000/delete_product/${id}`, {
+    await axios.delete(`https://fashion-connect-backend.onrender.com/delete_product/${id}`, {
       headers: { Authorization: `Bearer ${token}` }
     });
     await fetchProducts();
