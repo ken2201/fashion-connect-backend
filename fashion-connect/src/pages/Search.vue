@@ -9,14 +9,9 @@
     <!-- Contenu centré -->
     <div class="relative z-10 text-center text-white px-4 w-full">
       <!-- Nom du site -->
-      <h2 class="text-3xl md:text-4xl font-semibold mb-4 uppercase tracking-widest">
+      <h2 class="text-4xl md:text-5xl font-semibold mb-6 uppercase tracking-widest text-white">
         Fashion Connect
       </h2>
-
-      <!-- Titre de recherche -->
-      <h1 class="text-5xl md:text-6xl font-bold mb-10">
-        Search Engine
-      </h1>
 
       <!-- Barre de recherche -->
       <div class="flex items-center bg-white rounded-full overflow-hidden w-full max-w-2xl mx-auto shadow-lg">
@@ -24,42 +19,46 @@
           v-model="searchQuery"
           @keyup.enter="searchProducts"
           type="text"
-          placeholder="Search Clothes..."
-          class="w-full px-6 py-3 text-gray-700 focus:outline-none"
+          placeholder="Search clothes, shoes, accessories..."
+          class="w-full px-6 py-4 text-gray-700 focus:outline-none"
         />
         <button
           @click="searchProducts"
-          class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3"
+          class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-4"
         >
           🔍
         </button>
       </div>
 
-      <p class="mt-6 text-lg italic">Search Clothes</p>
+      <!-- Message temporaire -->
+      <p class="mt-6 text-lg italic text-white">Ex: T-shirt, dress, sneakers...</p>
     </div>
 
-    <!-- Affichage des produits (facultatif pour l'instant) -->
-    <div class="relative z-10 w-full max-w-5xl mt-10 px-4" v-if="products.length > 0">
-      <h3 class="text-2xl text-white mb-4">Search Results:</h3>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <!-- Résultats -->
+    <div class="relative z-10 w-full max-w-6xl mt-10 px-6" v-if="products.length > 0">
+      <h3 class="text-3xl text-white mb-6">Search Results</h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         <div
           v-for="product in products"
           :key="product.title"
-          class="bg-white rounded-lg shadow-md p-4"
+          class="bg-white rounded-lg shadow-md overflow-hidden"
         >
           <img
             :src="product.image"
             alt="Product image"
-            class="w-full h-48 object-cover rounded-md mb-2"
+            class="w-full h-48 object-cover"
           />
-          <h4 class="font-semibold text-lg">{{ product.title }}</h4>
-          <a
-            :href="product.link"
-            target="_blank"
-            class="text-blue-600 hover:underline"
-          >
-            View on H&M
-          </a>
+          <div class="p-4">
+            <h4 class="font-semibold text-lg mb-2 truncate">{{ product.title }}</h4>
+            <p class="text-gray-700 mb-2 font-bold">{{ product.price }}</p>
+            <a
+              :href="product.link"
+              target="_blank"
+              class="text-blue-600 hover:underline block text-center"
+            >
+              View on AliExpress
+            </a>
+          </div>
         </div>
       </div>
     </div>
@@ -70,29 +69,18 @@
 import { ref } from 'vue';
 import axios from 'axios';
 
-// Requête de recherche
 const searchQuery = ref('');
 const products = ref([]);
 
 const searchProducts = async () => {
   if (searchQuery.value.trim() === '') return;
   try {
-    console.log('Searching for:', searchQuery.value); // Vérification
     const response = await axios.get(
       `https://fashion-connect-backend.onrender.com/search?query=${encodeURIComponent(searchQuery.value)}`
     );
-    console.log('Results:', response.data); // Vérification
     products.value = response.data;
   } catch (error) {
     console.error('Search failed:', error);
   }
 };
 </script>
-
-<style scoped>
-body, html, #app {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-}
-</style>
