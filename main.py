@@ -1,54 +1,45 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import requests
 
 app = FastAPI()
 
-# --------------------- CORS ---------------------- #
+# Autoriser toutes les origines pour le frontend
 app.add_middleware(
     CORSMiddleware,
-    # Remplacer "*" par l'URL de ton frontend en production
-    allow_origins=["*"],
+    allow_origins=["*"],  # Remplacer "*" par ton domaine en prod
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# --------------------- CONFIGURATION RAPIDAPI ---------------------- #
-RAPIDAPI_KEY = "a7d11ac285mshe549df68303cba5p1d2d93jsn92e2c47865c5"
-RAPIDAPI_HOST = "aliexpress-datahub.p.rapidapi.com"
-
-# --------------------- ROUTE SEARCH ---------------------- #
+# Route API vers AliExpress via RapidAPI
 
 
 @app.get("/search")
 def search_products(query: str):
     url = "https://aliexpress-datahub.p.rapidapi.com/item_search"
     headers = {
-        "x-rapidapi-key": RAPIDAPI_KEY,
-        "x-rapidapi-host": RAPIDAPI_HOST
+        "x-rapidapi-host": "aliexpress-datahub.p.rapidapi.com",
+        "x-rapidapi-key": "a7d11ac285mshe549df68303cba5p1d2d93jsn92e2c47865c5",
     }
-    params = {
-        "q": query,
-        "page": "1",  # Tu peux ajouter "sort": "SALE_PRICE_ASC" pour trier par prix
-    }
+    params = {"q": query}
 
     response = requests.get(url, headers=headers, params=params)
 
-    if response.status_code != 200:
-        raise HTTPException(
-            status_code=response.status_code, detail="API Error")
-
-    api_data = response.json()
-
-    # --------------------- Adaptation des données ---------------------- #
-    results = []
-    for item in api_data.get("result", {}).get("resultList", []):
-        results.append({
-            "title": item.get("productTitle"),
-            "price": item.get("salePrice"),
-            "image": item.get("productMainImageUrl"),
-            "link": item.get("productDetailUrl"),
-        })
-
-    return results
+    if response.status_code == 200:
+        data = response.json()
+        # Adapter selon le format retourné par RapidAPI
+        items = data.get("result", {}).get("items", [])
+        results = [
+            {
+                "title": item.get("title"),
+                "image": item.get("image"),
+                "link": item.get("url"),
+                "price": item.get("price"),
+            }
+            for item in items
+        ]
+        return results
+    else:
+        return {"error": "Failed to fetch products"}
