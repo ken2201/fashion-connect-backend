@@ -1,7 +1,7 @@
 <template>
   <div
     class="min-h-screen flex flex-col justify-center items-center relative"
-    style="background-image: url('/background.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat; min-height: 100vh;"
+    style="background-image: url('/background.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat;"
   >
     <!-- Overlay sombre -->
     <div class="absolute inset-0 bg-black opacity-40"></div>
@@ -42,8 +42,16 @@
     <div class="relative z-10 w-full max-w-5xl mt-10 px-4" v-if="products.length > 0">
       <h3 class="text-2xl text-white mb-4">Search Results:</h3>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div v-for="product in products" :key="product.title" class="bg-white rounded-lg shadow-md p-4">
-          <img :src="product.image" alt="Product image" class="w-full h-48 object-cover rounded-md mb-2" />
+        <div
+          v-for="product in products"
+          :key="product.title"
+          class="bg-white rounded-lg shadow-md p-4"
+        >
+          <img
+            :src="product.image"
+            alt="Product image"
+            class="w-full h-48 object-cover rounded-md mb-2"
+          />
           <h4 class="font-semibold text-lg">{{ product.title }}</h4>
           <a
             :href="product.link"
@@ -69,13 +77,22 @@ const products = ref([]);
 const searchProducts = async () => {
   if (searchQuery.value.trim() === '') return;
   try {
+    console.log('Searching for:', searchQuery.value); // Vérification
     const response = await axios.get(
-  `https://fashion-connect-backend.onrender.com/search?query=${encodeURIComponent(searchQuery.value)}`
-);
-
+      `https://fashion-connect-backend.onrender.com/search?query=${encodeURIComponent(searchQuery.value)}`
+    );
+    console.log('Results:', response.data); // Vérification
     products.value = response.data;
   } catch (error) {
     console.error('Search failed:', error);
   }
 };
 </script>
+
+<style scoped>
+body, html, #app {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+</style>
