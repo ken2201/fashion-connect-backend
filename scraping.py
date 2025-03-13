@@ -1,36 +1,42 @@
-import requests
-from bs4 import BeautifulSoup
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+import time
 
 
-def scrape_hm(query):
+def scrape_hm(query: str):
+    # Configuration du navigateur headless
+    options = Options()
+    options.add_argument("--headless")  # Mode sans interface graphique
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+
+    # Remplace le chemin ci-dessous par celui de ton chromedriver si nécessaire
+    driver = webdriver.Chrome(options=options)
+
+    # URL de recherche H&M
     url = f"https://www2.hm.com/fr_fr/search-results.html?q={query}"
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
-    }
+    driver.get(url)
+    time.sleep(3)  # Laisse le temps à la page de charger
 
-    response = requests.get(url, headers=headers)
+    results = []
+    # Classe des produits sur la page
+    products = driver.find_elements(By.CLASS_NAME, "product-item")
 
-    if response.status_code != 200:
-        return []
-
-    soup = BeautifulSoup(response.content, "html.parser")
-    products = []
-
-    for item in soup.select('.product-item'):
+    for product in products[:10]:  # Limite aux 10 premiers résultats
         try:
-            title = item.select_one('.item-heading').get_text(strip=True)
-            link = "https://www2.hm.com" + item.select_one('a')['href']
-            image = item.select_one('img')['data-src']
-            price = item.select_one('.price').get_text(strip=True)
+            title = product.find_element(By.CLASS_NAME, "item-heading").text
+            link = product.find_element(By.TAG_NAME, "a").get_attribute("href")
+            image = product.find_element(
+                By.TAG_NAME, "img").get_attribute("src")
 
-            products.append({
+            results.append({
                 "title": title,
                 "link": link,
-                "image": image,
-                "price": price
+                "image": image
             })
-        except Exception as e:
-            print(f"Erreur produit : {e}")
-            continue
+        except:
+            continue  # Ignore les erreurs individuelles sur un produit
 
-    return products
+    driver.quit()  # Ferme le navigateur automatisé
+    return results
